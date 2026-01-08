@@ -141,7 +141,7 @@ curl -X POST "http://localhost:8000/api/v1/ask-question" \
 
 ```bash
 # Высокая температура = более креативно
-curl -X POST "http://localhost:8000/api/v1/ask" \
+curl -X POST "http://localhost:8000/api/v1/ask-question" \
   -H "Content-Type: application/json" \
   -d '{
     "question": "Give examples of Python use",
@@ -168,10 +168,6 @@ docker exec langchain_ollama ollama pull nomic-embed-text
 # Проверьте статистику
 curl http://localhost:8000/api/v1/stats
 
-# Проверьте поиск напрямую
-curl -X POST "http://localhost:8000/api/v1/search" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "test"}'
 ```
 
 ### Ошибка embeddings
