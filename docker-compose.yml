@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: langchain_fastapi
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=${APP_ENV}
+      - APP_PORT=${APP_PORT}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
+      - OLLAMA_MODEL=${OLLAMA_MODEL}
+      - COLLECTION_NAME=${COLLECTION_NAME}
+      - CHROMA_HOST=${CHROMA_HOST}
+      - CHROMA_PORT=${CHROMA_PORT}
+      - CHUNK_SIZE=${CHUNK_SIZE}
+      - CHUNK_OVERLAP=${CHUNK_OVERLAP}
+      - MAX_FILE_SIZE=${MAX_FILE_SIZE}
+    ports:
+      - "${APP_PORT}:8000"
+    volumes:
+      - ./app:/app/app
+    depends_on:
+      ollama:
+        condition: service_started
+      chromadb:
+        condition: service_started
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: langchain_ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT}:11434"
+    volumes:
+      - ./data/ollama:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: langchain_chromadb
+    restart: unless-stopped
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+    ports:
+      - "${CHROMA_PORT}:8000"
+    volumes:
+      - ./data/chroma:/data
